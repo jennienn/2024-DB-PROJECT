@@ -6,12 +6,10 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    // 데이터베이스 연결 정보
     private static final String URL = "jdbc:mysql://192.168.56.101:4567/club?useSSL=false&serverTimezone=UTC";
     private static final String USER = "kimyejin";
     private static final String PASSWORD = "1234";
 
-    // 데이터베이스 연결을 위한 메서드
     public static Connection connect() {
         Connection connection = null;
 
@@ -31,7 +29,7 @@ public class DatabaseConnection {
         return connection;
     }
 
-    // 데이터베이스 연결 종료를 위한 메서드
+
     public static void closeConnection(Connection connection) {
         if (connection != null) {
             try {
