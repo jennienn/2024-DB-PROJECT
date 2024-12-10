@@ -1,6 +1,7 @@
 package main;
 
 import db.DatabaseConnection;
+import service.ClubService;
 import service.MemberService;
 import java.sql.Connection;
 import java.util.Scanner;
@@ -64,19 +65,19 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    addMember(scanner, connection);
+                    MemberService.addMember(scanner, connection);
                     break;
                 case 2:
-                    deleteMember(scanner, connection);
+                    MemberService.deleteMember(scanner, connection);
                     break;
                 case 3:
-                    updateMember(scanner, connection);
+                    MemberService.updateMember(scanner, connection);
                     break;
                 case 4:
-                    viewMember(scanner, connection);
+                    MemberService.viewMember(scanner, connection);
                     break;
                 case 5:
-                    listMembers(connection);
+                    MemberService.listMembers(connection);
                     break;
                 case 6:
                     return;  // 이전 메뉴로 돌아가기
@@ -86,6 +87,7 @@ public class Main {
         }
     }
 
+    // 동아리 관리 메뉴
     private static void clubManagementMenu(Scanner scanner, Connection connection) {
         while (true) {
             System.out.println("\n동아리 관리 메뉴");
@@ -101,68 +103,22 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    addClub(scanner, connection);
+                    ClubService.addClub(scanner, connection);
                     break;
                 case 2:
-                    deleteClub(scanner, connection);
+                    ClubService.deleteClub(scanner, connection);
                     break;
                 case 3:
-                    viewClub(scanner, connection);
+                    ClubService.viewClub(scanner, connection);
                     break;
                 case 4:
-                    listClubs(connection);
+                    ClubService.listClubs(connection);
                     break;
                 case 5:
-                    return;
+                    return;  // 이전 메뉴로 돌아가기
                 default:
                     System.out.println("잘못된 선택입니다.");
             }
         }
-    }
-
-    private static void addMember(Scanner scanner, Connection connection) {
-        System.out.print("이름: ");
-        String name = scanner.nextLine();
-        System.out.print("학번: ");
-        String studentId = scanner.nextLine();
-        System.out.print("연락처: ");
-        String contact = scanner.nextLine();
-
-        System.out.println("회원이 성공적으로 추가되었습니다.");
-    }
-
-    private static void deleteMember(Scanner scanner, Connection connection) {
-        System.out.println("회원 삭제 기능");
-    }
-
-    private static void updateMember(Scanner scanner, Connection connection) {
-        System.out.println("회원 정보 수정 기능");
-    }
-
-    private static void viewMember(Scanner scanner, Connection connection) {
-        System.out.println("회원 조회 기능");
-    }
-
-    private static void listMembers(Connection connection) {
-        System.out.println("회원 목록 조회 기능");
-    }
-
-    private static void addClub(Scanner scanner, Connection connection) {
-        System.out.print("동아리 이름: ");
-        String clubName = scanner.nextLine();
-
-        System.out.println("동아리가 성공적으로 추가되었습니다.");
-    }
-
-    private static void deleteClub(Scanner scanner, Connection connection) {
-        System.out.println("동아리 삭제 기능");
-    }
-
-    private static void viewClub(Scanner scanner, Connection connection) {
-        System.out.println("동아리 조회 기능");
-    }
-
-    private static void listClubs(Connection connection) {
-        System.out.println("동아리 목록 조회 기능");
     }
 }
