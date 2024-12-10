@@ -8,6 +8,12 @@ public class PostService {
 
     // 게시글 추가
     public static void addPost(Scanner scanner, Connection connection, int memberId) {
+        // memberId가 Member 테이블에 존재하는지 확인
+        if (!isValidMemberId(connection, memberId)) {
+            System.out.println("해당 회원 ID는 존재하지 않습니다.");
+            return;
+        }
+
         System.out.print("제목: ");
         String title = scanner.nextLine();
         System.out.print("내용: ");
@@ -30,6 +36,22 @@ public class PostService {
             System.err.println("게시글 추가 중 오류 발생: " + e.getMessage());
         }
     }
+
+    // 회원 ID 유효성 체크
+    private static boolean isValidMemberId(Connection connection, int memberId) {
+        String sql = "SELECT COUNT(*) FROM Member WHERE memberID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, memberId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;  // 회원 ID가 존재하면 true, 존재하지 않으면 false
+            }
+        } catch (SQLException e) {
+            System.err.println("회원 ID 확인 중 오류 발생: " + e.getMessage());
+        }
+        return false;
+    }
+
 
     // 게시글 수정
     public static void updatePost(Scanner scanner, Connection connection) {
