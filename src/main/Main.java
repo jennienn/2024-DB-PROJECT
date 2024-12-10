@@ -3,6 +3,7 @@ package main;
 import db.DatabaseConnection;
 import service.ClubService;
 import service.MemberService;
+import service.PostService;
 import java.sql.Connection;
 import java.util.Scanner;
 
@@ -24,7 +25,8 @@ public class Main {
             System.out.println("메인 메뉴");
             System.out.println("1. 회원 관리");
             System.out.println("2. 동아리 관리");
-            System.out.println("3. 종료");
+            System.out.println("3. 게시글 관리");
+            System.out.println("4. 종료");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -38,6 +40,9 @@ public class Main {
                     clubManagementMenu(scanner, connection);
                     break;
                 case 3:
+                    postManagementMenu(scanner, connection);
+                    break;
+                case 4:
                     // 종료
                     System.out.println("프로그램을 종료합니다.");
                     DatabaseConnection.closeConnection(connection);
@@ -115,6 +120,48 @@ public class Main {
                     ClubService.listClubs(connection);
                     break;
                 case 5:
+                    return;  // 이전 메뉴로 돌아가기
+                default:
+                    System.out.println("잘못된 선택입니다.");
+            }
+        }
+    }
+
+    // 게시글 관리 메뉴
+    private static void postManagementMenu(Scanner scanner, Connection connection) {
+        while (true) {
+            System.out.println("\n게시글 관리 메뉴");
+            System.out.println("1. 게시글 추가");
+            System.out.println("2. 게시글 수정");
+            System.out.println("3. 게시글 삭제");
+            System.out.println("4. 게시글 조회");
+            System.out.println("5. 게시글 목록 조회");
+            System.out.println("6. 이전 메뉴로 돌아가기");
+            System.out.print("선택: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // 버퍼 비우기
+
+            switch (choice) {
+                case 1:
+                    System.out.print("회원 ID를 입력하세요: ");
+                    int memberId = scanner.nextInt();
+                    scanner.nextLine();  // 버퍼 비우기
+                    PostService.addPost(scanner, connection, memberId);
+                    break;
+                case 2:
+                    PostService.updatePost(scanner, connection);
+                    break;
+                case 3:
+                    PostService.deletePost(scanner, connection);
+                    break;
+                case 4:
+                    PostService.viewPost(scanner, connection);
+                    break;
+                case 5:
+                    PostService.listPosts(connection);
+                    break;
+                case 6:
                     return;  // 이전 메뉴로 돌아가기
                 default:
                     System.out.println("잘못된 선택입니다.");
