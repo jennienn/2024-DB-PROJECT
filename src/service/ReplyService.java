@@ -71,10 +71,33 @@ public class ReplyService {
     }
 
     // 답글 수정
-    public static void updateReply(Scanner scanner, Connection connection) {
+    public static void updateReply(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("수정할 답글 ID를 입력하세요: ");
         int replyId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
+
+        // 답글 작성자 확인
+        String authorCheckSql = "SELECT memberID FROM Reply WHERE replyID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(authorCheckSql)) {
+            stmt.setInt(1, replyId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int replyAuthorId = rs.getInt("memberID");
+
+                // 로그인한 회원과 답글 작성자가 일치하는지 확인
+                if (loggedInMemberId != replyAuthorId) {
+                    System.out.println("본인이 작성한 답글만 수정할 수 있습니다.");
+                    return;
+                }
+            } else {
+                System.out.println("해당 답글을 찾을 수 없습니다.");
+                return;
+            }
+        } catch (SQLException e) {
+            System.err.println("답글 작성자 확인 중 오류 발생: " + e.getMessage());
+            return;
+        }
 
         System.out.print("수정할 내용: ");
         String newContent = scanner.nextLine();
@@ -98,10 +121,33 @@ public class ReplyService {
     }
 
     // 답글 삭제
-    public static void deleteReply(Scanner scanner, Connection connection) {
+    public static void deleteReply(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("삭제할 답글 ID를 입력하세요: ");
         int replyId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
+
+        // 답글 작성자 확인
+        String authorCheckSql = "SELECT memberID FROM Reply WHERE replyID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(authorCheckSql)) {
+            stmt.setInt(1, replyId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int replyAuthorId = rs.getInt("memberID");
+
+                // 로그인한 회원과 답글 작성자가 일치하는지 확인
+                if (loggedInMemberId != replyAuthorId) {
+                    System.out.println("본인이 작성한 답글만 삭제할 수 있습니다.");
+                    return;
+                }
+            } else {
+                System.out.println("해당 답글을 찾을 수 없습니다.");
+                return;
+            }
+        } catch (SQLException e) {
+            System.err.println("답글 작성자 확인 중 오류 발생: " + e.getMessage());
+            return;
+        }
 
         String sql = "DELETE FROM Reply WHERE replyID = ?";
 
@@ -119,6 +165,7 @@ public class ReplyService {
             System.err.println("답글 삭제 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     // 답글 조회
     public static void viewReply(Scanner scanner, Connection connection) {

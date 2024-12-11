@@ -190,10 +190,10 @@ public class Main {
                     ReplyService.addReply(scanner, connection);
                     break;
                 case 2:
-                    ReplyService.updateReply(scanner, connection);
+                    ReplyService.updateReply(scanner, connection, loggedInMemberId);
                     break;
                 case 3:
-                    ReplyService.deleteReply(scanner, connection);
+                    ReplyService.deleteReply(scanner, connection, loggedInMemberId);
                     break;
                 case 4:
                     ReplyService.viewReply(scanner, connection);
