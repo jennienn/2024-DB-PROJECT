@@ -71,10 +71,33 @@ public class CommentService {
     }
 
     // 댓글 수정
-    public static void updateComment(Scanner scanner, Connection connection) {
+    public static void updateComment(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("수정할 댓글 ID를 입력하세요: ");
         int commentId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
+
+        // 댓글 작성자 확인
+        String authorCheckSql = "SELECT memberID FROM Comment WHERE commentID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(authorCheckSql)) {
+            stmt.setInt(1, commentId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int commentAuthorId = rs.getInt("memberID");
+
+                // 로그인한 회원과 댓글 작성자가 일치하는지 확인
+                if (loggedInMemberId != commentAuthorId) {
+                    System.out.println("본인이 작성한 댓글만 수정할 수 있습니다.");
+                    return;
+                }
+            } else {
+                System.out.println("해당 댓글을 찾을 수 없습니다.");
+                return;
+            }
+        } catch (SQLException e) {
+            System.err.println("댓글 작성자 확인 중 오류 발생: " + e.getMessage());
+            return;
+        }
 
         System.out.print("수정할 내용: ");
         String newContent = scanner.nextLine();
@@ -98,10 +121,33 @@ public class CommentService {
     }
 
     // 댓글 삭제
-    public static void deleteComment(Scanner scanner, Connection connection) {
+    public static void deleteComment(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("삭제할 댓글 ID를 입력하세요: ");
         int commentId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
+
+        // 댓글 작성자 확인
+        String authorCheckSql = "SELECT memberID FROM Comment WHERE commentID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(authorCheckSql)) {
+            stmt.setInt(1, commentId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int commentAuthorId = rs.getInt("memberID");
+
+                // 로그인한 회원과 댓글 작성자가 일치하는지 확인
+                if (loggedInMemberId != commentAuthorId) {
+                    System.out.println("본인이 작성한 댓글만 삭제할 수 있습니다.");
+                    return;
+                }
+            } else {
+                System.out.println("해당 댓글을 찾을 수 없습니다.");
+                return;
+            }
+        } catch (SQLException e) {
+            System.err.println("댓글 작성자 확인 중 오류 발생: " + e.getMessage());
+            return;
+        }
 
         String sql = "DELETE FROM Comment WHERE commentID = ?";
 
@@ -119,6 +165,7 @@ public class CommentService {
             System.err.println("댓글 삭제 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     // 댓글 조회
     public static void viewComment(Scanner scanner, Connection connection) {

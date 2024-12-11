@@ -153,10 +153,10 @@ public class Main {
                     CommentService.addComment(scanner, connection);
                     break;
                 case 2:
-                    CommentService.updateComment(scanner, connection);
+                    CommentService.updateComment(scanner, connection,loggedInMemberId);
                     break;
                 case 3:
-                    CommentService.deleteComment(scanner, connection);
+                    CommentService.deleteComment(scanner, connection,loggedInMemberId);
                     break;
                 case 4:
                     CommentService.viewComment(scanner, connection);
