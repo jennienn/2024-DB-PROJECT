@@ -8,59 +8,127 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static Integer loggedInMemberId = null;  // 로그인된 회원의 ID
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Connection connection = null;
-        boolean isConnected = false;
+        Connection connection = DatabaseConnection.connect();
 
-        // 첫 연결 시에만 연결하고 메시지를 출력
         while (true) {
-            if (!isConnected) {
-                connection = DatabaseConnection.connect();
-                isConnected = true;  // 한 번만 연결하도록 설정
-            }
-
-            // 메인 메뉴
-            System.out.println("메인 메뉴");
-            System.out.println("1. 회원 관리");
-            System.out.println("2. 동아리 관리");
-            System.out.println("3. 게시글 관리");
-            System.out.println("4. 댓글 관리");
-            System.out.println("5. 답글 관리");
-            System.out.println("6. 종료");
-            System.out.print("선택: ");
-
-            int choice = scanner.nextInt();
-            scanner.nextLine();  // 버퍼 비우기
-
-            switch (choice) {
-                case 1:
-                    memberManagementMenu(scanner, connection);
-                    break;
-                case 2:
-                    clubManagementMenu(scanner, connection);
-                    break;
-                case 3:
-                    postManagementMenu(scanner, connection);
-                    break;
-                case 4:
-                    commentManagementMenu(scanner, connection);
-                    break;
-                case 5:
-                    replyManagementMenu(scanner, connection);
-                    break;
-                case 6:
-                    // 종료
-                    System.out.println("프로그램을 종료합니다.");
-                    DatabaseConnection.closeConnection(connection);
-                    return;
-                default:
-                    System.out.println("잘못된 선택입니다.");
+            if (loggedInMemberId == null) {
+                // 로그인 상태가 아니면 로그인 메뉴 표시
+                loginMenu(scanner, connection);
+            } else {
+                // 로그인 상태일 경우 메인 메뉴 표시
+                mainMenu(scanner, connection);
             }
         }
     }
 
-    // 댓글 관리 메뉴 추가
+    // 로그인 메뉴
+    private static void loginMenu(Scanner scanner, Connection connection) {
+        System.out.println("로그인/회원가입 메뉴");
+        System.out.println("1. 로그인");
+        System.out.println("2. 회원가입");
+        System.out.println("3. 종료");
+        System.out.print("선택: ");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();  // 버퍼 비우기
+
+        switch (choice) {
+            case 1:
+                login(scanner, connection);
+                break;
+            case 2:
+                register(scanner, connection);
+                break;
+            case 3:
+                System.out.println("프로그램을 종료합니다.");
+                DatabaseConnection.closeConnection(connection);
+                System.exit(0);
+                break;
+            default:
+                System.out.println("잘못된 선택입니다.");
+        }
+    }
+
+    // 로그인 처리
+    private static void login(Scanner scanner, Connection connection) {
+        System.out.print("사용자 이름: ");
+        String username = scanner.nextLine();
+        System.out.print("비밀번호: ");
+        String password = scanner.nextLine();
+
+        if (MemberService.login(connection, username, password)) {
+            loggedInMemberId = MemberService.getMemberIdByUsername(connection, username);
+            System.out.println("로그인 성공!");
+        } else {
+            System.out.println("잘못된 사용자 이름 또는 비밀번호입니다.");
+        }
+    }
+
+    // 회원가입 처리
+    private static void register(Scanner scanner, Connection connection) {
+        System.out.print("사용자 이름: ");
+        String username = scanner.nextLine();
+        System.out.print("비밀번호: ");
+        String password = scanner.nextLine();
+        System.out.print("이름: ");
+        String name = scanner.nextLine();
+
+        if (MemberService.register(connection, username, password, name)) {
+            System.out.println("회원가입 성공!");
+        } else {
+            System.out.println("회원가입 실패. 사용자 이름이 중복될 수 있습니다.");
+        }
+    }
+
+    // 메인 메뉴
+    private static void mainMenu(Scanner scanner, Connection connection) {
+        System.out.println("\n메인 메뉴");
+        System.out.println("1. 회원 관리");
+        System.out.println("2. 동아리 관리");
+        System.out.println("3. 게시글 관리");
+        System.out.println("4. 댓글 관리");
+        System.out.println("5. 답글 관리");
+        System.out.println("6. 로그아웃");
+        System.out.print("선택: ");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();  // 버퍼 비우기
+
+        switch (choice) {
+            case 1:
+                memberManagementMenu(scanner, connection);
+                break;
+            case 2:
+                clubManagementMenu(scanner, connection);
+                break;
+            case 3:
+                postManagementMenu(scanner, connection);
+                break;
+            case 4:
+                commentManagementMenu(scanner, connection);
+                break;
+            case 5:
+                replyManagementMenu(scanner, connection);
+                break;
+            case 6:
+                logout();
+                break;
+            default:
+                System.out.println("잘못된 선택입니다.");
+        }
+    }
+
+    // 로그아웃
+    private static void logout() {
+        loggedInMemberId = null;
+        System.out.println("로그아웃 되었습니다.");
+    }
+
+    // 댓글 관리 메뉴
     private static void commentManagementMenu(Scanner scanner, Connection connection) {
         while (true) {
             System.out.println("\n댓글 관리 메뉴");
