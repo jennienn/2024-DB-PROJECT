@@ -108,7 +108,7 @@ public class Main {
                 memberManagementMenu(scanner, connection);
                 break;
             case 2:
-                clubManagementMenu(scanner, connection);
+                clubManagementMenu(scanner, connection, loggedInMemberId);
                 break;
             case 3:
                 postManagementMenu(scanner, connection);
@@ -245,14 +245,13 @@ public class Main {
 
 
     // 동아리 관리 메뉴
-    private static void clubManagementMenu(Scanner scanner, Connection connection) {
+    private static void clubManagementMenu(Scanner scanner, Connection connection, int memberId) {
         while (true) {
             System.out.println("\n동아리 관리 메뉴");
-            System.out.println("1. 동아리 추가");
-            System.out.println("2. 동아리 삭제");
-            System.out.println("3. 동아리 조회");
-            System.out.println("4. 동아리 목록 조회");
-            System.out.println("5. 이전 메뉴로 돌아가기");
+            System.out.println("1. 동아리 가입");
+            System.out.println("2. 동아리 조회");
+            System.out.println("3. 동아리 목록 조회");
+            System.out.println("4. 이전 메뉴로 돌아가기");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -260,24 +259,23 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    ClubService.addClub(scanner, connection);
+                    ClubService.joinClub(scanner, connection, memberId);  // 로그인한 멤버 아이디를 전달
                     break;
                 case 2:
-                    ClubService.deleteClub(scanner, connection);
-                    break;
-                case 3:
                     ClubService.viewClub(scanner, connection);
                     break;
-                case 4:
+                case 3:
                     ClubService.listClubs(connection);
                     break;
-                case 5:
+                case 4:
                     return;  // 이전 메뉴로 돌아가기
                 default:
                     System.out.println("잘못된 선택입니다.");
             }
         }
     }
+
+
 
     // 게시글 관리 메뉴
     private static void postManagementMenu(Scanner scanner, Connection connection) {
