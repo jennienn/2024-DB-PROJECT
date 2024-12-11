@@ -196,42 +196,85 @@ public class MemberService {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // 수정할 정보 입력
-                System.out.println("현재 이름: " + rs.getString("name"));
-                System.out.print("새로운 이름 (현재 이름 그대로 입력 시 변경 없음): ");
-                String name = scanner.nextLine();
-                if (!name.isEmpty()) {
-                    rs.updateString("name", name);
+                // 기존 정보 표시
+                String currentUsername = rs.getString("username");
+                String currentName = rs.getString("name");
+                String currentStudentId = rs.getString("studentID");
+                String currentContact = rs.getString("contact");
+
+                System.out.println("현재 이메일: " + currentUsername);
+                System.out.println("현재 이름: " + currentName);
+                System.out.println("현재 학번: " + currentStudentId);
+                System.out.println("현재 연락처: " + currentContact);
+
+                // 수정할 정보 입력 받기
+                System.out.print("새 이메일 (현재 이메일: " + currentUsername + "): ");
+                String newUsername = scanner.nextLine();
+                System.out.print("새 이름 (현재 이름: " + currentName + "): ");
+                String newName = scanner.nextLine();
+                System.out.print("새 학번 (현재 학번: " + currentStudentId + "): ");
+                String newStudentId = scanner.nextLine();
+                System.out.print("새 연락처 (현재 연락처: " + currentContact + "): ");
+                String newContact = scanner.nextLine();
+
+                // 이메일 중복 확인
+                if (!newUsername.equals(currentUsername)) {
+                    String emailCheckSql = "SELECT COUNT(*) FROM Member WHERE username = ?";
+                    try (PreparedStatement emailStmt = connection.prepareStatement(emailCheckSql)) {
+                        emailStmt.setString(1, newUsername);
+                        ResultSet emailRs = emailStmt.executeQuery();
+                        emailRs.next();
+                        if (emailRs.getInt(1) > 0) {
+                            System.out.println("입력한 이메일은 이미 다른 회원에 의해 사용 중입니다.");
+                            return;
+                        }
+                    }
                 }
 
-                System.out.println("현재 연락처: " + rs.getString("contact"));
-                System.out.print("새로운 연락처 (현재 연락처 그대로 입력 시 변경 없음): ");
-                String contact = scanner.nextLine();
-                if (!contact.isEmpty()) {
-                    rs.updateString("contact", contact);
+                // 학번 중복 확인
+                if (!newStudentId.equals(currentStudentId)) {
+                    String studentIdCheckSql = "SELECT COUNT(*) FROM Member WHERE studentID = ?";
+                    try (PreparedStatement studentIdStmt = connection.prepareStatement(studentIdCheckSql)) {
+                        studentIdStmt.setString(1, newStudentId);
+                        ResultSet studentIdRs = studentIdStmt.executeQuery();
+                        studentIdRs.next();
+                        if (studentIdRs.getInt(1) > 0) {
+                            System.out.println("입력한 학번은 이미 다른 회원에 의해 사용 중입니다.");
+                            return;
+                        }
+                    }
                 }
 
-                // 수정된 정보 저장
-                String updateSql = "UPDATE Member SET name = ?, contact = ? WHERE memberId = ?";
+                // 유효성 검사 (이메일 형식 확인)
+                if (!isValidEmail(newUsername)) {
+                    System.out.println("이메일 형식이 올바르지 않습니다.");
+                    return;
+                }
+
+                String updateSql = "UPDATE Member SET username = ?, name = ?, studentID = ?, contact = ? WHERE memberId = ?";
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
-                    updateStmt.setString(1, rs.getString("name"));
-                    updateStmt.setString(2, rs.getString("contact"));
-                    updateStmt.setInt(3, memberId);
+                    updateStmt.setString(1, newUsername);
+                    updateStmt.setString(2, newName);
+                    updateStmt.setString(3, newStudentId);
+                    updateStmt.setString(4, newContact);
+                    updateStmt.setInt(5, memberId);
+
                     int rowsAffected = updateStmt.executeUpdate();
                     if (rowsAffected > 0) {
-                        System.out.println("정보가 성공적으로 수정되었습니다.");
+                        System.out.println("회원 정보가 성공적으로 수정되었습니다.");
                     } else {
-                        System.out.println("정보 수정에 실패했습니다.");
+                        System.out.println("회원 정보 수정에 실패했습니다.");
                     }
                 }
 
             } else {
-                System.out.println("회원 정보를 찾을 수 없습니다.");
+                System.out.println("회원 정보가 없습니다.");
             }
         } catch (SQLException e) {
-            System.err.println("정보 수정 중 오류 발생: " + e.getMessage());
+            System.err.println("회원 정보 수정 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     // 회원 탈퇴
     public static void deleteMember(Integer memberId, Connection connection) {
