@@ -4,6 +4,7 @@ import db.DatabaseConnection;
 import service.ClubService;
 import service.MemberService;
 import service.PostService;
+import service.CommentService;  // 댓글 서비스 추가
 import java.sql.Connection;
 import java.util.Scanner;
 
@@ -26,7 +27,8 @@ public class Main {
             System.out.println("1. 회원 관리");
             System.out.println("2. 동아리 관리");
             System.out.println("3. 게시글 관리");
-            System.out.println("4. 종료");
+            System.out.println("4. 댓글 관리");  // 댓글 관리 메뉴 추가
+            System.out.println("5. 종료");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -43,6 +45,9 @@ public class Main {
                     postManagementMenu(scanner, connection);
                     break;
                 case 4:
+                    commentManagementMenu(scanner, connection);  // 댓글 관리 메뉴 호출
+                    break;
+                case 5:
                     // 종료
                     System.out.println("프로그램을 종료합니다.");
                     DatabaseConnection.closeConnection(connection);
@@ -52,6 +57,47 @@ public class Main {
             }
         }
     }
+
+    // 댓글 관리 메뉴 추가
+    private static void commentManagementMenu(Scanner scanner, Connection connection) {
+        while (true) {
+            System.out.println("\n댓글 관리 메뉴");
+            System.out.println("1. 댓글 추가");
+            System.out.println("2. 댓글 수정");
+            System.out.println("3. 댓글 삭제");
+            System.out.println("4. 댓글 조회");
+            System.out.println("5. 댓글 목록 조회");
+            System.out.println("6. 이전 메뉴로 돌아가기");
+            System.out.print("선택: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // 버퍼 비우기
+
+            switch (choice) {
+                case 1:
+                    CommentService.addComment(scanner, connection);
+                    break;
+                case 2:
+                    CommentService.updateComment(scanner, connection);
+                    break;
+                case 3:
+                    CommentService.deleteComment(scanner, connection);
+                    break;
+                case 4:
+                    CommentService.viewComment(scanner, connection);
+                    break;
+                case 5:
+                    CommentService.listComments(connection);
+                    break;
+                case 6:
+                    return;  // 이전 메뉴로 돌아가기
+                default:
+                    System.out.println("잘못된 선택입니다.");
+            }
+        }
+    }
+
+
 
     // 회원 관리 메뉴
     private static void memberManagementMenu(Scanner scanner, Connection connection) {
