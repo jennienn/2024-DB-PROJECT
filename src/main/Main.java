@@ -302,10 +302,10 @@ public class Main {
                     PostService.addPost(scanner, connection, memberId);
                     break;
                 case 2:
-                    PostService.updatePost(scanner, connection);
+                    PostService.updatePost(scanner, connection, loggedInMemberId);
                     break;
                 case 3:
-                    PostService.deletePost(scanner, connection);
+                    PostService.deletePost(scanner, connection, loggedInMemberId);
                     break;
                 case 4:
                     PostService.viewPost(scanner, connection);

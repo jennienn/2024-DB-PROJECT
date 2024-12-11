@@ -53,11 +53,19 @@ public class PostService {
     }
 
 
+
+
     // 게시글 수정
-    public static void updatePost(Scanner scanner, Connection connection) {
+    public static void updatePost(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("수정할 게시글 ID를 입력하세요: ");
         int postId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
+
+        // 게시글 작성자와 로그인한 회원이 같은지 확인
+        if (!isPostOwner(connection, postId, loggedInMemberId)) {
+            System.out.println("본인만 수정할 수 있습니다.");
+            return;
+        }
 
         System.out.print("수정할 제목: ");
         String newTitle = scanner.nextLine();
@@ -82,11 +90,18 @@ public class PostService {
         }
     }
 
+
     // 게시글 삭제
-    public static void deletePost(Scanner scanner, Connection connection) {
+    public static void deletePost(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("삭제할 게시글 ID를 입력하세요: ");
         int postId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
+
+        // 게시글 작성자와 로그인한 회원이 같은지 확인
+        if (!isPostOwner(connection, postId, loggedInMemberId)) {
+            System.out.println("본인만 삭제할 수 있습니다.");
+            return;
+        }
 
         String sql = "DELETE FROM Post WHERE postID = ?";
 
@@ -148,4 +163,22 @@ public class PostService {
             System.err.println("게시글 목록 조회 중 오류 발생: " + e.getMessage());
         }
     }
+
+    // 게시글 작성자 확인
+    private static boolean isPostOwner(Connection connection, int postId, int loggedInMemberId) {
+        String sql = "SELECT memberID FROM Post WHERE postID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, postId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int postOwnerId = rs.getInt("memberID");
+                return postOwnerId == loggedInMemberId;
+            }
+        } catch (SQLException e) {
+            System.err.println("게시글 작성자 확인 중 오류 발생: " + e.getMessage());
+        }
+        return false;
+    }
 }
+
