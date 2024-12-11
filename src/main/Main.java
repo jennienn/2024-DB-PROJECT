@@ -207,18 +207,14 @@ public class Main {
     }
 
 
-
-
     // 회원 관리 메뉴
     private static void memberManagementMenu(Scanner scanner, Connection connection) {
         while (true) {
             System.out.println("\n회원 관리 메뉴");
-            System.out.println("1. 회원 추가");
-            System.out.println("2. 회원 삭제");
-            System.out.println("3. 회원 정보 수정");
-            System.out.println("4. 회원 조회");
-            System.out.println("5. 회원 목록 조회");
-            System.out.println("6. 이전 메뉴로 돌아가기");
+            System.out.println("1. 나의 정보 수정");
+            System.out.println("2. 회원 탈퇴");
+            System.out.println("3. 회원 목록 조회");
+            System.out.println("4. 이전 메뉴로 돌아가기");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -226,27 +222,24 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    MemberService.addMember(scanner, connection);
+                    MemberService.updateMemberInfo(scanner, connection, loggedInMemberId);
                     break;
                 case 2:
-                    MemberService.deleteMember(scanner, connection);
-                    break;
+                    MemberService.deleteMember(connection, loggedInMemberId);
+                    loggedInMemberId = null;  // 로그아웃 처리
+                    System.out.println("로그아웃 되었습니다.");
+                    return;  // 로그인/회원가입 메뉴로 돌아가기
                 case 3:
-                    MemberService.updateMember(scanner, connection);
-                    break;
-                case 4:
-                    MemberService.viewMember(scanner, connection);
-                    break;
-                case 5:
                     MemberService.listMembers(connection);
                     break;
-                case 6:
+                case 4:
                     return;  // 이전 메뉴로 돌아가기
                 default:
                     System.out.println("잘못된 선택입니다.");
             }
         }
     }
+
 
     // 동아리 관리 메뉴
     private static void clubManagementMenu(Scanner scanner, Connection connection) {

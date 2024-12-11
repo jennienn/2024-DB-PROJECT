@@ -130,80 +130,80 @@ public class MemberService {
         return false;
     }
 
-    // 회원 삭제
-    public static void deleteMember(Scanner scanner, Connection connection) {
-        System.out.print("삭제할 회원 ID를 입력하세요: ");
-        int memberId = scanner.nextInt();
-        scanner.nextLine();  // 버퍼 비우기
+    // 나의 정보 수정
+    public static void updateMemberInfo(Scanner scanner, Connection connection, Integer memberId) {
+        System.out.println("수정할 정보를 입력하세요.");
 
-        String sql = "DELETE FROM Member WHERE memberId = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, memberId);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("회원이 성공적으로 삭제되었습니다.");
-            } else {
-                System.out.println("회원 삭제에 실패했습니다.");
-            }
-        } catch (SQLException e) {
-            System.err.println("회원 삭제 중 오류 발생: " + e.getMessage());
-        }
-    }
-
-// 회원 정보 수정
-    public static void updateMember(Scanner scanner, Connection connection) {
-        System.out.print("수정할 회원 ID를 입력하세요: ");
-        int memberId = scanner.nextInt();
-        scanner.nextLine();  // 버퍼 비우기
-
-        System.out.print("새로운 이름: ");
-        String name = scanner.nextLine();
-        System.out.print("새로운 학번: ");
-        String studentId = scanner.nextLine();
-        System.out.print("새로운 연락처: ");
-        String contact = scanner.nextLine();
-
-        String sql = "UPDATE Member SET name = ?, studentId = ?, contact = ? WHERE memberId = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            stmt.setString(2, studentId);
-            stmt.setString(3, contact);
-            stmt.setInt(4, memberId);
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("회원 정보가 성공적으로 수정되었습니다.");
-            } else {
-                System.out.println("회원 정보 수정에 실패했습니다. 해당 회원이 존재하지 않거나 이미 수정되었습니다.");
-            }
-        } catch (SQLException e) {
-            System.err.println("회원 정보 수정 중 오류 발생: " + e.getMessage());
-        }
-    }
-
-    // 회원 조회
-    public static void viewMember(Scanner scanner, Connection connection) {
-        System.out.print("조회할 회원 ID를 입력하세요: ");
-        int memberId = scanner.nextInt();
-        scanner.nextLine();  // 버퍼 비우기
-
+        // 현재 회원 정보를 조회
         String sql = "SELECT * FROM Member WHERE memberId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, memberId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                System.out.println("회원 ID: " + rs.getInt("memberId"));
-                System.out.println("이름: " + rs.getString("name"));
-                System.out.println("학번: " + rs.getString("studentId"));
-                System.out.println("연락처: " + rs.getString("contact"));
+                // 기존 정보 표시
+                System.out.println("현재 이메일: " + rs.getString("username"));
+                System.out.println("현재 이름: " + rs.getString("name"));
+                System.out.println("현재 학번: " + rs.getString("studentID"));
+                System.out.println("현재 연락처: " + rs.getString("contact"));
+
+                // 수정할 정보 입력 받기
+                System.out.print("새 이메일 (현재 이메일: " + rs.getString("username") + "): ");
+                String username = scanner.nextLine();
+                System.out.print("새 이름 (현재 이름: " + rs.getString("name") + "): ");
+                String name = scanner.nextLine();
+                System.out.print("새 학번 (현재 학번: " + rs.getString("studentID") + "): ");
+                String studentId = scanner.nextLine();
+                System.out.print("새 연락처 (현재 연락처: " + rs.getString("contact") + "): ");
+                String contact = scanner.nextLine();
+
+                // 유효성 검사
+                if (!isValidEmail(username)) {
+                    System.out.println("이메일 형식이 올바르지 않습니다.");
+                    return;
+                }
+
+                String updateSql = "UPDATE Member SET username = ?, name = ?, studentID = ?, contact = ? WHERE memberId = ?";
+                try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+                    updateStmt.setString(1, username);
+                    updateStmt.setString(2, name);
+                    updateStmt.setString(3, studentId);
+                    updateStmt.setString(4, contact);
+                    updateStmt.setInt(5, memberId);
+
+                    int rowsAffected = updateStmt.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("회원 정보가 성공적으로 수정되었습니다.");
+                    } else {
+                        System.out.println("회원 정보 수정에 실패했습니다.");
+                    }
+                }
+
             } else {
-                System.out.println("회원이 존재하지 않습니다.");
+                System.out.println("회원 정보가 없습니다.");
             }
         } catch (SQLException e) {
-            System.err.println("회원 조회 중 오류 발생: " + e.getMessage());
+            System.err.println("회원 정보 수정 중 오류 발생: " + e.getMessage());
         }
     }
+
+    // 회원 탈퇴
+    public static void deleteMember(Connection connection, Integer memberId) {
+        String sql = "DELETE FROM Member WHERE memberId = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, memberId);
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("회원 탈퇴가 완료되었습니다.");
+            } else {
+                System.out.println("회원 탈퇴에 실패했습니다.");
+            }
+        } catch (SQLException e) {
+            System.err.println("회원 탈퇴 중 오류 발생: " + e.getMessage());
+        }
+    }
+
 
     // 회원 목록 조회
     public static void listMembers(Connection connection) {
@@ -213,12 +213,12 @@ public class MemberService {
 
             System.out.println("회원 목록:");
             while (rs.next()) {
-                int memberId = rs.getInt("memberId");
-                String name = rs.getString("name");
-                String studentId = rs.getString("studentId");
-                String contact = rs.getString("contact");
-
-                System.out.println("회원 ID: " + memberId + ", 이름: " + name + ", 학번: " + studentId + ", 연락처: " + contact);
+                System.out.println("회원 ID: " + rs.getInt("memberId"));
+                System.out.println("이메일: " + rs.getString("username"));
+                System.out.println("이름: " + rs.getString("name"));
+                System.out.println("학번: " + rs.getString("studentID"));
+                System.out.println("연락처: " + rs.getString("contact"));
+                System.out.println("=====================================");
             }
         } catch (SQLException e) {
             System.err.println("회원 목록 조회 중 오류 발생: " + e.getMessage());
