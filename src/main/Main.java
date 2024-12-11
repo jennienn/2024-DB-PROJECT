@@ -55,7 +55,7 @@ public class Main {
 
     // 로그인 처리
     private static void login(Scanner scanner, Connection connection) {
-        System.out.print("사용자 이름: ");
+        System.out.print("이메일: ");
         String username = scanner.nextLine();
         System.out.print("비밀번호: ");
         String password = scanner.nextLine();
@@ -64,25 +64,30 @@ public class Main {
             loggedInMemberId = MemberService.getMemberIdByUsername(connection, username);
             System.out.println("로그인 성공!");
         } else {
-            System.out.println("잘못된 사용자 이름 또는 비밀번호입니다.");
+            System.out.println("잘못된 이메일 또는 비밀번호입니다.");
         }
     }
 
     // 회원가입 처리
     private static void register(Scanner scanner, Connection connection) {
-        System.out.print("사용자 이름: ");
+        System.out.print("이메일: ");
         String username = scanner.nextLine();
         System.out.print("비밀번호: ");
         String password = scanner.nextLine();
         System.out.print("이름: ");
         String name = scanner.nextLine();
+        System.out.print("학번: ");
+        String studentId = scanner.nextLine();
+        System.out.print("연락처: ");
+        String contact = scanner.nextLine();
 
-        if (MemberService.register(connection, username, password, name)) {
+        if (MemberService.register(connection, username, password, name, studentId, contact)) {
             System.out.println("회원가입 성공!");
         } else {
-            System.out.println("회원가입 실패. 사용자 이름이 중복될 수 있습니다.");
+            System.out.println("회원가입 실패..");
         }
     }
+
 
     // 메인 메뉴
     private static void mainMenu(Scanner scanner, Connection connection) {
