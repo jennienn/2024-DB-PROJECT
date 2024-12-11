@@ -16,6 +16,41 @@ public class CommentService {
         System.out.print("댓글 내용: ");
         String content = scanner.nextLine();
 
+        // 게시글이 존재하는지 확인
+        String postCheckSql = "SELECT COUNT(*) FROM Post WHERE postID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(postCheckSql)) {
+            stmt.setInt(1, postId);
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            int postCount = rs.getInt(1);
+
+            if (postCount == 0) {
+                System.out.println("해당 게시글 ID는 존재하지 않습니다. 댓글을 추가할 수 없습니다.");
+                return; // 게시글이 존재하지 않으면 댓글 추가를 중단
+            }
+        } catch (SQLException e) {
+            System.err.println("게시글 조회 중 오류 발생: " + e.getMessage());
+            return;
+        }
+
+        // 회원이 존재하는지 확인
+        String memberCheckSql = "SELECT COUNT(*) FROM Member WHERE memberID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(memberCheckSql)) {
+            stmt.setInt(1, memberId);
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            int memberCount = rs.getInt(1);
+
+            if (memberCount == 0) {
+                System.out.println("해당 회원 ID는 존재하지 않습니다. 댓글을 추가할 수 없습니다.");
+                return; // 회원이 존재하지 않으면 댓글 추가를 중단
+            }
+        } catch (SQLException e) {
+            System.err.println("회원 조회 중 오류 발생: " + e.getMessage());
+            return;
+        }
+
+        // 댓글 추가
         String sql = "INSERT INTO Comment (postID, memberID, content, createdDate) VALUES (?, ?, ?, NOW())";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
