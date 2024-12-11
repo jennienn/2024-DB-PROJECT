@@ -21,6 +21,36 @@ public class MemberService {
         return password.length() >= 8;
     }
 
+    // 이메일 중복 체크
+    public static boolean isEmailTaken(Connection connection, String email) {
+        String sql = "SELECT COUNT(*) FROM Member WHERE username = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true;  // 이메일 중복
+            }
+        } catch (SQLException e) {
+            System.err.println("이메일 중복 확인 중 오류 발생: " + e.getMessage());
+        }
+        return false;  // 이메일 사용 가능
+    }
+
+    // 학번 중복 체크
+    public static boolean isStudentIdTaken(Connection connection, String studentId) {
+        String sql = "SELECT COUNT(*) FROM Member WHERE studentID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, studentId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true;  // 학번 중복
+            }
+        } catch (SQLException e) {
+            System.err.println("학번 중복 확인 중 오류 발생: " + e.getMessage());
+        }
+        return false;  // 학번 사용 가능
+    }
+
     // 회원 추가 (회원가입)
     public static void addMember(Scanner scanner, Connection connection) {
         System.out.print("사용자 이름 (이메일): ");
@@ -29,6 +59,12 @@ public class MemberService {
         // 이메일 형식 체크
         if (!isValidEmail(username)) {
             System.out.println("이메일 형식이 올바르지 않습니다.");
+            return;
+        }
+
+        // 이메일 중복 체크
+        if (isEmailTaken(connection, username)) {
+            System.out.println("이미 사용 중인 이메일입니다.");
             return;
         }
 
@@ -45,6 +81,13 @@ public class MemberService {
         String name = scanner.nextLine();
         System.out.print("학번: ");
         String studentId = scanner.nextLine();
+
+        // 학번 중복 체크
+        if (isStudentIdTaken(connection, studentId)) {
+            System.out.println("이미 등록된 학번입니다.");
+            return;
+        }
+
         System.out.print("연락처: ");
         String contact = scanner.nextLine();
 
@@ -104,6 +147,18 @@ public class MemberService {
 
     // 회원가입 처리
     public static boolean register(Connection connection, String username, String password, String name, String studentId, String contact) {
+        // 이메일 중복 체크
+        if (isEmailTaken(connection, username)) {
+            System.out.println("이미 사용 중인 이메일입니다.");
+            return false;
+        }
+
+        // 학번 중복 체크
+        if (isStudentIdTaken(connection, studentId)) {
+            System.out.println("이미 등록된 학번입니다.");
+            return false;
+        }
+
         // 이메일 형식과 비밀번호 체크
         if (!isValidEmail(username)) {
             System.out.println("이메일 형식이 올바르지 않습니다.");
@@ -141,59 +196,49 @@ public class MemberService {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // 기존 정보 표시
-                System.out.println("현재 이메일: " + rs.getString("username"));
+                // 수정할 정보 입력
                 System.out.println("현재 이름: " + rs.getString("name"));
-                System.out.println("현재 학번: " + rs.getString("studentID"));
-                System.out.println("현재 연락처: " + rs.getString("contact"));
-
-                // 수정할 정보 입력 받기
-                System.out.print("새 이메일 (현재 이메일: " + rs.getString("username") + "): ");
-                String username = scanner.nextLine();
-                System.out.print("새 이름 (현재 이름: " + rs.getString("name") + "): ");
+                System.out.print("새로운 이름 (현재 이름 그대로 입력 시 변경 없음): ");
                 String name = scanner.nextLine();
-                System.out.print("새 학번 (현재 학번: " + rs.getString("studentID") + "): ");
-                String studentId = scanner.nextLine();
-                System.out.print("새 연락처 (현재 연락처: " + rs.getString("contact") + "): ");
-                String contact = scanner.nextLine();
-
-                // 유효성 검사
-                if (!isValidEmail(username)) {
-                    System.out.println("이메일 형식이 올바르지 않습니다.");
-                    return;
+                if (!name.isEmpty()) {
+                    rs.updateString("name", name);
                 }
 
-                String updateSql = "UPDATE Member SET username = ?, name = ?, studentID = ?, contact = ? WHERE memberId = ?";
-                try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
-                    updateStmt.setString(1, username);
-                    updateStmt.setString(2, name);
-                    updateStmt.setString(3, studentId);
-                    updateStmt.setString(4, contact);
-                    updateStmt.setInt(5, memberId);
+                System.out.println("현재 연락처: " + rs.getString("contact"));
+                System.out.print("새로운 연락처 (현재 연락처 그대로 입력 시 변경 없음): ");
+                String contact = scanner.nextLine();
+                if (!contact.isEmpty()) {
+                    rs.updateString("contact", contact);
+                }
 
+                // 수정된 정보 저장
+                String updateSql = "UPDATE Member SET name = ?, contact = ? WHERE memberId = ?";
+                try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+                    updateStmt.setString(1, rs.getString("name"));
+                    updateStmt.setString(2, rs.getString("contact"));
+                    updateStmt.setInt(3, memberId);
                     int rowsAffected = updateStmt.executeUpdate();
                     if (rowsAffected > 0) {
-                        System.out.println("회원 정보가 성공적으로 수정되었습니다.");
+                        System.out.println("정보가 성공적으로 수정되었습니다.");
                     } else {
-                        System.out.println("회원 정보 수정에 실패했습니다.");
+                        System.out.println("정보 수정에 실패했습니다.");
                     }
                 }
 
             } else {
-                System.out.println("회원 정보가 없습니다.");
+                System.out.println("회원 정보를 찾을 수 없습니다.");
             }
         } catch (SQLException e) {
-            System.err.println("회원 정보 수정 중 오류 발생: " + e.getMessage());
+            System.err.println("정보 수정 중 오류 발생: " + e.getMessage());
         }
     }
 
     // 회원 탈퇴
-    public static void deleteMember(Connection connection, Integer memberId) {
+    public static void deleteMember(Integer memberId, Connection connection) {
         String sql = "DELETE FROM Member WHERE memberId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, memberId);
             int rowsAffected = stmt.executeUpdate();
-
             if (rowsAffected > 0) {
                 System.out.println("회원 탈퇴가 완료되었습니다.");
             } else {
@@ -204,24 +249,22 @@ public class MemberService {
         }
     }
 
-
     // 회원 목록 조회
     public static void listMembers(Connection connection) {
-        String sql = "SELECT * FROM Member";
+        String sql = "SELECT memberId, username, name, studentID, contact FROM Member";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
-
-            System.out.println("회원 목록:");
             while (rs.next()) {
-                System.out.println("회원 ID: " + rs.getInt("memberId"));
+                System.out.println("ID: " + rs.getInt("memberId"));
                 System.out.println("이메일: " + rs.getString("username"));
                 System.out.println("이름: " + rs.getString("name"));
                 System.out.println("학번: " + rs.getString("studentID"));
                 System.out.println("연락처: " + rs.getString("contact"));
-                System.out.println("=====================================");
+                System.out.println("----------------------------");
             }
         } catch (SQLException e) {
             System.err.println("회원 목록 조회 중 오류 발생: " + e.getMessage());
         }
     }
+
 }

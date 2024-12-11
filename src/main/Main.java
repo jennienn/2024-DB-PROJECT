@@ -225,11 +225,13 @@ public class Main {
                     MemberService.updateMemberInfo(scanner, connection, loggedInMemberId);
                     break;
                 case 2:
-                    MemberService.deleteMember(connection, loggedInMemberId);
-                    loggedInMemberId = null;  // 로그아웃 처리
-                    System.out.println("로그아웃 되었습니다.");
-                    return;  // 로그인/회원가입 메뉴로 돌아가기
+                    // 회원 탈퇴 처리 후 로그인 메뉴로 돌아가기
+                    MemberService.deleteMember(loggedInMemberId, connection); // 수정된 부분
+                    loggedInMemberId = null; // 로그아웃 처리
+                    System.out.println("회원 탈퇴가 완료되었습니다. 로그인/회원가입 메뉴로 돌아갑니다.");
+                    return; // 로그인 메뉴로 돌아가기
                 case 3:
+                    // 회원 목록 조회
                     MemberService.listMembers(connection);
                     break;
                 case 4:
@@ -239,6 +241,7 @@ public class Main {
             }
         }
     }
+
 
 
     // 동아리 관리 메뉴
