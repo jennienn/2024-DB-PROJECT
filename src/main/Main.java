@@ -1,10 +1,8 @@
 package main;
 
 import db.DatabaseConnection;
-import service.ClubService;
-import service.MemberService;
-import service.PostService;
-import service.CommentService;  // 댓글 서비스 추가
+import service.*;
+
 import java.sql.Connection;
 import java.util.Scanner;
 
@@ -27,8 +25,9 @@ public class Main {
             System.out.println("1. 회원 관리");
             System.out.println("2. 동아리 관리");
             System.out.println("3. 게시글 관리");
-            System.out.println("4. 댓글 관리");  // 댓글 관리 메뉴 추가
-            System.out.println("5. 종료");
+            System.out.println("4. 댓글 관리");
+            System.out.println("5. 답글 관리");
+            System.out.println("6. 종료");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -45,9 +44,12 @@ public class Main {
                     postManagementMenu(scanner, connection);
                     break;
                 case 4:
-                    commentManagementMenu(scanner, connection);  // 댓글 관리 메뉴 호출
+                    commentManagementMenu(scanner, connection);
                     break;
                 case 5:
+                    replyManagementMenu(scanner, connection);
+                    break;
+                case 6:
                     // 종료
                     System.out.println("프로그램을 종료합니다.");
                     DatabaseConnection.closeConnection(connection);
@@ -96,6 +98,41 @@ public class Main {
             }
         }
     }
+
+    private static void replyManagementMenu(Scanner scanner, Connection connection) {
+        while (true) {
+            System.out.println("\n답글 관리 메뉴");
+            System.out.println("1. 답글 추가");
+            System.out.println("2. 답글 수정");
+            System.out.println("3. 답글 삭제");
+            System.out.println("4. 답글 조회");
+            System.out.println("5. 이전 메뉴로 돌아가기");
+            System.out.print("선택: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // 버퍼 비우기
+
+            switch (choice) {
+                case 1:
+                    ReplyService.addReply(scanner, connection);
+                    break;
+                case 2:
+                    ReplyService.updateReply(scanner, connection);
+                    break;
+                case 3:
+                    ReplyService.deleteReply(scanner, connection);
+                    break;
+                case 4:
+                    ReplyService.viewReply(scanner, connection);
+                    break;
+                case 5:
+                    return;  // 이전 메뉴로 돌아가기
+                default:
+                    System.out.println("잘못된 선택입니다.");
+            }
+        }
+    }
+
 
 
 
