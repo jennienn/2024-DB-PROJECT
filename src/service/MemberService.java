@@ -292,22 +292,32 @@ public class MemberService {
         }
     }
 
-    // 회원 목록 조회
-    public static void listMembers(Connection connection) {
-        String sql = "SELECT memberId, username, name, studentID, contact FROM Member";
+    // 가입한 동아리 조회
+    public static void listJoinedClubs(Connection connection, Integer memberId) {
+        String sql = "SELECT Club.clubName FROM ClubMember " +
+                "JOIN Club ON Club.clubID = ClubMember.clubID " +
+                "WHERE ClubMember.memberID = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, memberId);  // 로그인한 회원의 ID를 사용
             ResultSet rs = stmt.executeQuery();
+
+            System.out.println("가입한 동아리:");
+            boolean hasClubs = false;  // 가입한 동아리가 있는지 확인하는 변수
+
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("memberId"));
-                System.out.println("이메일: " + rs.getString("username"));
-                System.out.println("이름: " + rs.getString("name"));
-                System.out.println("학번: " + rs.getString("studentID"));
-                System.out.println("연락처: " + rs.getString("contact"));
-                System.out.println("----------------------------");
+                String clubName = rs.getString("clubName");
+                System.out.println(clubName);  // 동아리 이름 출력
+                hasClubs = true;
+            }
+
+            if (!hasClubs) {
+                System.out.println("가입한 동아리가 없습니다.");
             }
         } catch (SQLException e) {
-            System.err.println("회원 목록 조회 중 오류 발생: " + e.getMessage());
+            System.err.println("가입한 동아리 조회 중 오류 발생: " + e.getMessage());
         }
     }
+
 
 }

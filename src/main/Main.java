@@ -29,7 +29,9 @@ public class Main {
 
     // 로그인 메뉴
     private static void loginMenu(Scanner scanner, Connection connection) {
-        System.out.println("로그인/회원가입 메뉴");
+        System.out.println("====================================");
+        System.out.println("          로그인 / 회원가입");
+        System.out.println("====================================");
         System.out.println("1. 로그인");
         System.out.println("2. 회원가입");
         System.out.println("3. 종료");
@@ -46,17 +48,20 @@ public class Main {
                 register(scanner, connection);
                 break;
             case 3:
-                System.out.println("프로그램을 종료합니다.");
+                System.out.println("프로그램을 종료합니다. 감사합니다!");
                 DatabaseConnection.closeConnection(connection);
                 System.exit(0);
                 break;
             default:
-                System.out.println("잘못된 선택입니다.");
+                System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
         }
     }
 
     // 로그인 처리
     private static void login(Scanner scanner, Connection connection) {
+        System.out.println("====================================");
+        System.out.println("        로그인 화면");
+        System.out.println("====================================");
         System.out.print("이메일: ");
         String username = scanner.nextLine();
         System.out.print("비밀번호: ");
@@ -64,14 +69,17 @@ public class Main {
 
         if (MemberService.login(connection, username, password)) {
             loggedInMemberId = MemberService.getMemberIdByUsername(connection, username);
-            System.out.println("로그인 성공!");
+            System.out.println("로그인 성공! 환영합니다.");
         } else {
-            System.out.println("잘못된 이메일 또는 비밀번호입니다.");
+            System.out.println("잘못된 이메일 또는 비밀번호입니다. 다시 시도해주세요.");
         }
     }
 
     // 회원가입 처리
     private static void register(Scanner scanner, Connection connection) {
+        System.out.println("====================================");
+        System.out.println("        회원가입 화면");
+        System.out.println("====================================");
         System.out.print("이메일: ");
         String username = scanner.nextLine();
         System.out.print("비밀번호: ");
@@ -84,16 +92,17 @@ public class Main {
         String contact = scanner.nextLine();
 
         if (MemberService.register(connection, username, password, name, studentId, contact)) {
-            System.out.println("회원가입 성공!");
+            System.out.println("회원가입이 완료되었습니다! 이제 로그인하실 수 있습니다.");
         } else {
-            System.out.println("회원가입 실패..");
+            System.out.println("회원가입에 실패했습니다. 다시 시도해주세요.");
         }
     }
 
-
     // 메인 메뉴
     private static void mainMenu(Scanner scanner, Connection connection) {
-        System.out.println("\n메인 메뉴");
+        System.out.println("====================================");
+        System.out.println("               메인 메뉴");
+        System.out.println("====================================");
         System.out.println("1. 회원 관리");
         System.out.println("2. 동아리 관리");
         System.out.println("3. 게시글 관리");
@@ -125,20 +134,22 @@ public class Main {
                 logout();
                 break;
             default:
-                System.out.println("잘못된 선택입니다.");
+                System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
         }
     }
 
     // 로그아웃
     private static void logout() {
         loggedInMemberId = null;
-        System.out.println("로그아웃 되었습니다.");
+        System.out.println("로그아웃 되었습니다. 다시 로그인해주세요.");
     }
 
     // 댓글 관리 메뉴
     private static void commentManagementMenu(Scanner scanner, Connection connection) {
         while (true) {
-            System.out.println("\n댓글 관리 메뉴");
+            System.out.println("\n====================================");
+            System.out.println("         댓글 관리 메뉴");
+            System.out.println("====================================");
             System.out.println("1. 댓글 추가");
             System.out.println("2. 댓글 수정");
             System.out.println("3. 댓글 삭제");
@@ -155,10 +166,10 @@ public class Main {
                     CommentService.addComment(scanner, connection);
                     break;
                 case 2:
-                    CommentService.updateComment(scanner, connection,loggedInMemberId);
+                    CommentService.updateComment(scanner, connection, loggedInMemberId);
                     break;
                 case 3:
-                    CommentService.deleteComment(scanner, connection,loggedInMemberId);
+                    CommentService.deleteComment(scanner, connection, loggedInMemberId);
                     break;
                 case 4:
                     CommentService.viewComment(scanner, connection);
@@ -169,14 +180,16 @@ public class Main {
                 case 6:
                     return;  // 이전 메뉴로 돌아가기
                 default:
-                    System.out.println("잘못된 선택입니다.");
+                    System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
             }
         }
     }
 
     private static void replyManagementMenu(Scanner scanner, Connection connection) {
         while (true) {
-            System.out.println("\n답글 관리 메뉴");
+            System.out.println("\n====================================");
+            System.out.println("         답글 관리 메뉴");
+            System.out.println("====================================");
             System.out.println("1. 답글 추가");
             System.out.println("2. 답글 수정");
             System.out.println("3. 답글 삭제");
@@ -203,19 +216,20 @@ public class Main {
                 case 5:
                     return;  // 이전 메뉴로 돌아가기
                 default:
-                    System.out.println("잘못된 선택입니다.");
+                    System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
             }
         }
     }
 
-
     // 회원 관리 메뉴
     private static void memberManagementMenu(Scanner scanner, Connection connection) {
         while (true) {
-            System.out.println("\n회원 관리 메뉴");
+            System.out.println("\n====================================");
+            System.out.println("         회원 관리 메뉴");
+            System.out.println("====================================");
             System.out.println("1. 나의 정보 수정");
             System.out.println("2. 회원 탈퇴");
-            System.out.println("3. 회원 목록 조회");
+            System.out.println("3. 내가 가입한 동아리 조회");
             System.out.println("4. 이전 메뉴로 돌아가기");
             System.out.print("선택: ");
 
@@ -233,21 +247,22 @@ public class Main {
                     System.out.println("회원 탈퇴가 완료되었습니다. 로그인/회원가입 메뉴로 돌아갑니다.");
                     return; // 로그인 메뉴로 돌아가기
                 case 3:
-                    // 회원 목록 조회
-                    MemberService.listMembers(connection);
+                    MemberService.listJoinedClubs(connection, loggedInMemberId);
                     break;
                 case 4:
                     return;  // 이전 메뉴로 돌아가기
                 default:
-                    System.out.println("잘못된 선택입니다.");
+                    System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
             }
         }
     }
 
-
+    // 동아리 메뉴
     private static void clubManagementMenu(Scanner scanner, Connection connection, int memberId) {
         while (true) {
-            System.out.println("\n동아리 메뉴");
+            System.out.println("\n====================================");
+            System.out.println("         동아리 관리 메뉴");
+            System.out.println("====================================");
             System.out.println("1. 동아리 가입");
             System.out.println("2. 동아리 목록 조회");
             System.out.println("3. 동아리 회장 목록 조회");
@@ -282,17 +297,17 @@ public class Main {
                 case 7:
                     return;  // 이전 메뉴로 돌아가기
                 default:
-                    System.out.println("잘못된 선택입니다.");
+                    System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
             }
         }
     }
 
-
-
     // 게시글 관리 메뉴
     private static void postManagementMenu(Scanner scanner, Connection connection) {
         while (true) {
-            System.out.println("\n게시글 관리 메뉴");
+            System.out.println("\n====================================");
+            System.out.println("         게시글 관리 메뉴");
+            System.out.println("====================================");
             System.out.println("1. 게시글 추가");
             System.out.println("2. 게시글 수정");
             System.out.println("3. 게시글 삭제");
@@ -326,7 +341,7 @@ public class Main {
                 case 6:
                     return;  // 이전 메뉴로 돌아가기
                 default:
-                    System.out.println("잘못된 선택입니다.");
+                    System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
             }
         }
     }
