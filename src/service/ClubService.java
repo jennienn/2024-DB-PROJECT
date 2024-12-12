@@ -49,7 +49,6 @@ public class ClubService {
         }
     }
 
-
     // 동아리 목록 조회
     public static void listClubs(Connection connection) {
         String sql = "SELECT * FROM Club";
@@ -68,26 +67,65 @@ public class ClubService {
         }
     }
 
-    // 동아리 조회
-    public static void viewClub(Scanner scanner, Connection connection) {
-        System.out.print("조회할 동아리 ID를 입력하세요: ");
-        int clubId = scanner.nextInt();
-        scanner.nextLine();  // 버퍼 비우기
-
-        String sql = "SELECT * FROM Club WHERE clubID = ?";
+    // 동아리 회장 목록 조회
+    public static void listClubPresidents(Connection connection) {
+        String sql = "SELECT Club.clubName, ClubPresident.presidentName FROM ClubPresident " +
+                "JOIN Club ON Club.clubID = ClubPresident.clubID";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, clubId);
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            System.out.println("동아리 회장 목록:");
+            while (rs.next()) {
                 String clubName = rs.getString("clubName");
-                System.out.println("동아리 ID: " + clubId);
-                System.out.println("동아리 이름: " + clubName);
-            } else {
-                System.out.println("동아리가 존재하지 않습니다.");
+                String presidentName = rs.getString("presidentName");
+
+                System.out.println(clubName + " 동아리 회장: " + presidentName);
             }
         } catch (SQLException e) {
-            System.err.println("동아리 조회 중 오류 발생: " + e.getMessage());
+            System.err.println("동아리 회장 목록 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    // 동아리 지도 교수 목록 조회
+    public static void listClubProfessors(Connection connection) {
+        String sql = "SELECT Club.clubName, Professor.name AS professorName FROM ClubProfessor " +
+                "JOIN Club ON Club.clubID = ClubProfessor.clubID " +
+                "JOIN Professor ON Professor.professorID = ClubProfessor.professorID";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("동아리 지도 교수 목록:");
+            while (rs.next()) {
+                String clubName = rs.getString("clubName");
+                String professorName = rs.getString("professorName");
+
+                System.out.println(clubName + " 동아리 지도 교수: " + professorName);
+            }
+        } catch (SQLException e) {
+            System.err.println("동아리 지도 교수 목록 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    // 동아리 활동 일정 목록 조회
+    public static void listClubSchedules(Connection connection) {
+        String sql = "SELECT Club.clubName, ActivitySchedule.scheduleName, ActivitySchedule.date, ActivitySchedule.time, ActivitySchedule.location " +
+                "FROM ActivitySchedule " +
+                "JOIN Club ON Club.clubID = ActivitySchedule.clubID";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("동아리 활동 일정 목록:");
+            while (rs.next()) {
+                String clubName = rs.getString("clubName");
+                String scheduleName = rs.getString("scheduleName");
+                String date = rs.getString("date");
+                String time = rs.getString("time");
+                String location = rs.getString("location");
+
+                System.out.println(clubName + " 동아리 활동: " + scheduleName + " (" + date + " " + time + " @ " + location + ")");
+            }
+        } catch (SQLException e) {
+            System.err.println("동아리 활동 일정 목록 조회 중 오류 발생: " + e.getMessage());
         }
     }
 }

@@ -6,6 +6,8 @@ import service.*;
 import java.sql.Connection;
 import java.util.Scanner;
 
+import static service.ClubService.*;
+
 public class Main {
 
     private static Integer loggedInMemberId = null;  // 로그인된 회원의 ID
@@ -243,15 +245,15 @@ public class Main {
     }
 
 
-
-    // 동아리 관리 메뉴
     private static void clubManagementMenu(Scanner scanner, Connection connection, int memberId) {
         while (true) {
-            System.out.println("\n동아리 관리 메뉴");
+            System.out.println("\n동아리 메뉴");
             System.out.println("1. 동아리 가입");
-            System.out.println("2. 동아리 조회");
-            System.out.println("3. 동아리 목록 조회");
-            System.out.println("4. 이전 메뉴로 돌아가기");
+            System.out.println("2. 동아리 목록 조회");
+            System.out.println("3. 동아리 회장 목록 조회");
+            System.out.println("4. 동아리 지도 교수 목록 조회");
+            System.out.println("5. 동아리 활동 일정 목록 조회");
+            System.out.println("6. 이전 메뉴로 돌아가기");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -262,12 +264,18 @@ public class Main {
                     ClubService.joinClub(scanner, connection, memberId);  // 로그인한 멤버 아이디를 전달
                     break;
                 case 2:
-                    ClubService.viewClub(scanner, connection);
-                    break;
-                case 3:
                     ClubService.listClubs(connection);
                     break;
+                case 3:
+                    ClubService.listClubPresidents(connection);
+                    break;
                 case 4:
+                    ClubService.listClubProfessors(connection);
+                    break;
+                case 5:
+                    ClubService.listClubSchedules(connection);
+                    break;
+                case 6:
                     return;  // 이전 메뉴로 돌아가기
                 default:
                     System.out.println("잘못된 선택입니다.");
