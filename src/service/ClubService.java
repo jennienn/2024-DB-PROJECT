@@ -15,6 +15,24 @@ public class ClubService {
         int clubId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
 
+        // 이미 다른 동아리에 가입되어 있는지 확인
+        String checkMemberClubSql = "SELECT COUNT(*) FROM ClubMember WHERE memberID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(checkMemberClubSql)) {
+            stmt.setInt(1, memberId);
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            int memberClubCount = rs.getInt(1);
+
+            // 이미 가입된 동아리가 있는 경우, 가입할 수 없도록 처리
+            if (memberClubCount > 0) {
+                System.out.println("이미 다른 동아리에 가입되어 있습니다. 하나의 동아리만 가입할 수 있습니다.");
+                return;
+            }
+        } catch (SQLException e) {
+            System.err.println("동아리 가입 확인 중 오류 발생: " + e.getMessage());
+            return;
+        }
+
         // 동아리가 존재하는지 확인
         String checkClubSql = "SELECT COUNT(*) FROM Club WHERE clubID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(checkClubSql)) {
@@ -48,6 +66,7 @@ public class ClubService {
             System.err.println("동아리 가입 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     // 동아리 목록 조회
     public static void listClubs(Connection connection) {
@@ -157,11 +176,11 @@ public class ClubService {
                         System.out.println();  // 동아리 구분을 위해 줄바꿈
                     }
                     currentClub = clubName;
-                    System.out.println(clubName + " 동아리 회원:");
+                    System.out.println("["+ clubName + " 동아리]");
                 }
 
                 // 회원 정보 출력
-                System.out.println("학번: " + studentID + ", 이름: " + memberName + ", 연락처: " + contact);
+                System.out.println("학번: " + studentID + " | 이름: " + memberName + " | 연락처: " + contact);
             }
         } catch (SQLException e) {
             System.err.println("동아리 회원 목록 조회 중 오류 발생: " + e.getMessage());
