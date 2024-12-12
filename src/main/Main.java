@@ -202,7 +202,7 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    ReplyService.addReply(scanner, connection);
+                    ReplyService.addReply(scanner, connection, loggedInMemberId);
                     break;
                 case 2:
                     ReplyService.updateReply(scanner, connection, loggedInMemberId);

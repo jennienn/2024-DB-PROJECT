@@ -7,11 +7,9 @@ import java.util.Scanner;
 public class ReplyService {
 
     // 답글 추가
-    public static void addReply(Scanner scanner, Connection connection) {
+    public static void addReply(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("답글을 달 댓글 ID를 입력하세요: ");
         int commentId = scanner.nextInt();
-        System.out.print("회원 ID를 입력하세요: ");
-        int memberId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
         System.out.print("답글 내용: ");
         String content = scanner.nextLine();
@@ -33,29 +31,11 @@ public class ReplyService {
             return;
         }
 
-        // 회원이 존재하는지 확인
-        String memberCheckSql = "SELECT COUNT(*) FROM Member WHERE memberID = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(memberCheckSql)) {
-            stmt.setInt(1, memberId);
-            ResultSet rs = stmt.executeQuery();
-            rs.next();
-            int memberCount = rs.getInt(1);
-
-            if (memberCount == 0) {
-                System.out.println("해당 회원 ID는 존재하지 않습니다. 답글을 추가할 수 없습니다.");
-                return; // 회원이 존재하지 않으면 답글 추가를 중단
-            }
-        } catch (SQLException e) {
-            System.err.println("회원 조회 중 오류 발생: " + e.getMessage());
-            return;
-        }
-
         // 답글 추가
         String sql = "INSERT INTO Reply (commentID, memberID, content, modifiedDate) VALUES (?, ?, ?, NOW())";
-
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, commentId);
-            stmt.setInt(2, memberId);
+            stmt.setInt(2, loggedInMemberId);  // 로그인한 회원의 ID 사용
             stmt.setString(3, content);
 
             int rowsAffected = stmt.executeUpdate();
@@ -165,7 +145,6 @@ public class ReplyService {
             System.err.println("답글 삭제 중 오류 발생: " + e.getMessage());
         }
     }
-
 
     // 답글 조회
     public static void viewReply(Scanner scanner, Connection connection) {

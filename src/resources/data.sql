@@ -1,7 +1,7 @@
 --- DB명 ----
 use club;
 
---- 프로그램 실행 전 아래의 데이터 추가 --
+--- 프로그램 실행 전 직접 mysql에 데이터 추가 후 실행  --
 INSERT INTO Club (clubName) VALUES ('네스트넷');
 INSERT INTO Club (clubName) VALUES ('샘마루');
 INSERT INTO Club (clubName) VALUES ('큐빅');
