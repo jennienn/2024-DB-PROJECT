@@ -7,9 +7,9 @@ import java.util.Scanner;
 public class PostService {
 
     // 게시글 추가
-    public static void addPost(Scanner scanner, Connection connection, int memberId) {
-        // memberId가 Member 테이블에 존재하는지 확인
-        if (!isValidMemberId(connection, memberId)) {
+    public static void addPost(Scanner scanner, Connection connection, int loggedInMemberId) {
+        // 회원 ID가 유효한지 확인
+        if (!isValidMemberId(connection, loggedInMemberId)) {
             System.out.println("해당 회원 ID는 존재하지 않습니다.");
             return;
         }
@@ -22,7 +22,7 @@ public class PostService {
         String sql = "INSERT INTO Post (memberID, title, content, createdDate) VALUES (?, ?, ?, NOW())";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, memberId);
+            stmt.setInt(1, loggedInMemberId);  // 로그인한 회원의 ID 사용
             stmt.setString(2, title);
             stmt.setString(3, content);
             int rowsAffected = stmt.executeUpdate();
@@ -51,9 +51,6 @@ public class PostService {
         }
         return false;
     }
-
-
-
 
     // 게시글 수정
     public static void updatePost(Scanner scanner, Connection connection, int loggedInMemberId) {
@@ -89,7 +86,6 @@ public class PostService {
             System.err.println("게시글 수정 중 오류 발생: " + e.getMessage());
         }
     }
-
 
     // 게시글 삭제
     public static void deletePost(Scanner scanner, Connection connection, int loggedInMemberId) {
@@ -181,4 +177,3 @@ public class PostService {
         return false;
     }
 }
-

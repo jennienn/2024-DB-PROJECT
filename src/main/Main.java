@@ -325,10 +325,7 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    System.out.print("회원 ID를 입력하세요: ");
-                    int memberId = scanner.nextInt();
-                    scanner.nextLine();  // 버퍼 비우기
-                    PostService.addPost(scanner, connection, memberId);
+                    PostService.addPost(scanner, connection, loggedInMemberId);
                     break;
                 case 2:
                     PostService.updatePost(scanner, connection, loggedInMemberId);
