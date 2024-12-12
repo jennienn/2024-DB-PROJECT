@@ -132,4 +132,39 @@ public class ClubService {
             System.err.println("동아리 활동 일정 목록 조회 중 오류 발생: " + e.getMessage());
         }
     }
+
+    // 동아리별 회원 목록 조회
+    public static void listClubMembers(Connection connection) {
+        String sql = "SELECT Club.clubName, Member.studentID, Member.name, Member.contact " +
+                "FROM ClubMember " +
+                "JOIN Club ON Club.clubID = ClubMember.clubID " +
+                "JOIN Member ON Member.memberID = ClubMember.memberID " +
+                "ORDER BY Club.clubName";  // 동아리 이름별로 정렬
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+
+            String currentClub = null;
+
+            while (rs.next()) {
+                String clubName = rs.getString("clubName");
+                String studentID = rs.getString("studentID");
+                String memberName = rs.getString("name");
+                String contact = rs.getString("contact");
+
+                // 새로운 동아리가 나올 때마다 동아리 이름을 출력
+                if (currentClub == null || !currentClub.equals(clubName)) {
+                    if (currentClub != null) {
+                        System.out.println();  // 동아리 구분을 위해 줄바꿈
+                    }
+                    currentClub = clubName;
+                    System.out.println(clubName + " 동아리 회원:");
+                }
+
+                // 회원 정보 출력
+                System.out.println("학번: " + studentID + ", 이름: " + memberName + ", 연락처: " + contact);
+            }
+        } catch (SQLException e) {
+            System.err.println("동아리 회원 목록 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
 }

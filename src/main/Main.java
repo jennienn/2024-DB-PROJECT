@@ -253,7 +253,8 @@ public class Main {
             System.out.println("3. 동아리 회장 목록 조회");
             System.out.println("4. 동아리 지도 교수 목록 조회");
             System.out.println("5. 동아리 활동 일정 목록 조회");
-            System.out.println("6. 이전 메뉴로 돌아가기");
+            System.out.println("6. 동아리 회원 조회");
+            System.out.println("7. 이전 메뉴로 돌아가기");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -276,6 +277,9 @@ public class Main {
                     ClubService.listClubSchedules(connection);
                     break;
                 case 6:
+                    ClubService.listClubMembers(connection);
+                    break;
+                case 7:
                     return;  // 이전 메뉴로 돌아가기
                 default:
                     System.out.println("잘못된 선택입니다.");
