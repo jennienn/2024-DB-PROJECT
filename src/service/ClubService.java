@@ -88,7 +88,8 @@ public class ClubService {
 
     // 동아리 지도 교수 목록 조회
     public static void listClubProfessors(Connection connection) {
-        String sql = "SELECT Club.clubName, Professor.name AS professorName FROM ClubProfessor " +
+        String sql = "SELECT Club.clubName, Professor.name AS professorName, Professor.contact AS professorContact, Professor.affiliation AS professorAffiliation " +
+                "FROM ClubProfessor " +
                 "JOIN Club ON Club.clubID = ClubProfessor.clubID " +
                 "JOIN Professor ON Professor.professorID = ClubProfessor.professorID";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -98,13 +99,16 @@ public class ClubService {
             while (rs.next()) {
                 String clubName = rs.getString("clubName");
                 String professorName = rs.getString("professorName");
+                String professorContact = rs.getString("professorContact");
+                String professorAffiliation = rs.getString("professorAffiliation");
 
-                System.out.println(clubName + " 동아리 지도 교수: " + professorName);
+                System.out.println(clubName + " 동아리 지도 교수: " + professorName + " | 연락처: " + professorContact + " | 소속: " + professorAffiliation);
             }
         } catch (SQLException e) {
             System.err.println("동아리 지도 교수 목록 조회 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     // 동아리 활동 일정 목록 조회
     public static void listClubSchedules(Connection connection) {
