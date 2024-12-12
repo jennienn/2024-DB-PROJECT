@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS Professor (
     professorID INT AUTO_INCREMENT PRIMARY KEY,
     affiliation VARCHAR(100),
     contact VARCHAR(15)
+    name VARCHAR(100)
     );
 
 CREATE TABLE IF NOT EXISTS ClubMember (

@@ -50,8 +50,8 @@ public class ClubService {
             return;
         }
 
-        // 동아리 가입
-        String sql = "INSERT INTO ClubMember (clubID, memberID) VALUES (?, ?)";
+        // 동아리 가입 (현재 날짜를 joinDate로 설정)
+        String sql = "INSERT INTO ClubMember (clubID, memberID, joinDate) VALUES (?, ?, CURDATE())";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, clubId);
             stmt.setInt(2, memberId);
@@ -66,6 +66,7 @@ public class ClubService {
             System.err.println("동아리 가입 중 오류 발생: " + e.getMessage());
         }
     }
+
 
 
     // 동아리 목록 조회
@@ -154,7 +155,7 @@ public class ClubService {
 
     // 동아리별 회원 목록 조회
     public static void listClubMembers(Connection connection) {
-        String sql = "SELECT Club.clubName, Member.studentID, Member.name, Member.contact " +
+        String sql = "SELECT Club.clubName, Member.studentID, Member.name, Member.contact, ClubMember.joinDate " +
                 "FROM ClubMember " +
                 "JOIN Club ON Club.clubID = ClubMember.clubID " +
                 "JOIN Member ON Member.memberID = ClubMember.memberID " +
@@ -169,6 +170,7 @@ public class ClubService {
                 String studentID = rs.getString("studentID");
                 String memberName = rs.getString("name");
                 String contact = rs.getString("contact");
+                String joinDate = rs.getString("joinDate"); // 가입일자 가져오기
 
                 // 새로운 동아리가 나올 때마다 동아리 이름을 출력
                 if (currentClub == null || !currentClub.equals(clubName)) {
@@ -179,13 +181,14 @@ public class ClubService {
                     System.out.println("["+ clubName + " 동아리]");
                 }
 
-                // 회원 정보 출력
-                System.out.println("학번: " + studentID + " | 이름: " + memberName + " | 연락처: " + contact);
+                // 회원 정보 출력 (가입일자 포함)
+                System.out.println("학번: " + studentID + " | 이름: " + memberName + " | 연락처: " + contact + " | 가입일자: " + joinDate);
             }
         } catch (SQLException e) {
             System.err.println("동아리 회원 목록 조회 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     // 동아리 탈퇴 (로그인한 회원이 가입한 동아리에서 자동으로 탈퇴)
     public static void leaveClub(Scanner scanner, Connection connection, int memberId) {
