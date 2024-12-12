@@ -194,7 +194,8 @@ public class Main {
             System.out.println("2. 답글 수정");
             System.out.println("3. 답글 삭제");
             System.out.println("4. 답글 조회");
-            System.out.println("5. 이전 메뉴로 돌아가기");
+            System.out.println("5. 답글 목록 조회");
+            System.out.println("6. 이전 메뉴로 돌아가기");
             System.out.print("선택: ");
 
             int choice = scanner.nextInt();
@@ -214,6 +215,9 @@ public class Main {
                     ReplyService.viewReply(scanner, connection);
                     break;
                 case 5:
+                    ReplyService.listReplies(connection);
+                    break;
+                case 6:
                     return;  // 이전 메뉴로 돌아가기
                 default:
                     System.out.println("잘못된 선택입니다. 다시 시도해주세요.");

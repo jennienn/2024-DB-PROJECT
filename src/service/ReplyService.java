@@ -171,4 +171,31 @@ public class ReplyService {
             System.err.println("답글 조회 중 오류 발생: " + e.getMessage());
         }
     }
+    // 답글 목록 조회
+    public static void listReplies(Connection connection) {
+        String sql = "SELECT * FROM Reply ORDER BY modifiedDate DESC";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+
+            boolean hasReplies = false;
+
+            while (rs.next()) {
+                hasReplies = true;
+                System.out.println("답글 ID: " + rs.getInt("replyID"));
+                System.out.println("댓글 ID: " + rs.getInt("commentID"));
+                System.out.println("회원 ID: " + rs.getInt("memberID"));
+                System.out.println("내용: " + rs.getString("content"));
+                System.out.println("수정일: " + rs.getTimestamp("modifiedDate"));
+                System.out.println("------------");
+            }
+
+            if (!hasReplies) {
+                System.out.println("현재 등록된 답글이 없습니다.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("답글 목록 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
 }
