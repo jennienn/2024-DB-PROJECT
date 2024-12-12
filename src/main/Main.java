@@ -163,7 +163,7 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    CommentService.addComment(scanner, connection);
+                    CommentService.addComment(scanner, connection, loggedInMemberId);
                     break;
                 case 2:
                     CommentService.updateComment(scanner, connection, loggedInMemberId);

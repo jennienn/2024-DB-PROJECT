@@ -7,11 +7,9 @@ import java.util.Scanner;
 public class CommentService {
 
     // 댓글 추가
-    public static void addComment(Scanner scanner, Connection connection) {
+    public static void addComment(Scanner scanner, Connection connection, int loggedInMemberId) {
         System.out.print("게시글 ID를 입력하세요: ");
         int postId = scanner.nextInt();
-        System.out.print("회원 ID를 입력하세요: ");
-        int memberId = scanner.nextInt();
         scanner.nextLine();  // 버퍼 비우기
         System.out.print("댓글 내용: ");
         String content = scanner.nextLine();
@@ -33,29 +31,12 @@ public class CommentService {
             return;
         }
 
-        // 회원이 존재하는지 확인
-        String memberCheckSql = "SELECT COUNT(*) FROM Member WHERE memberID = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(memberCheckSql)) {
-            stmt.setInt(1, memberId);
-            ResultSet rs = stmt.executeQuery();
-            rs.next();
-            int memberCount = rs.getInt(1);
-
-            if (memberCount == 0) {
-                System.out.println("해당 회원 ID는 존재하지 않습니다. 댓글을 추가할 수 없습니다.");
-                return; // 회원이 존재하지 않으면 댓글 추가를 중단
-            }
-        } catch (SQLException e) {
-            System.err.println("회원 조회 중 오류 발생: " + e.getMessage());
-            return;
-        }
-
         // 댓글 추가
         String sql = "INSERT INTO Comment (postID, memberID, content, createdDate) VALUES (?, ?, ?, NOW())";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, postId);
-            stmt.setInt(2, memberId);
+            stmt.setInt(2, loggedInMemberId); // 로그인한 회원 ID로 댓글 작성
             stmt.setString(3, content);
 
             int rowsAffected = stmt.executeUpdate();
@@ -159,13 +140,12 @@ public class CommentService {
             if (rowsAffected > 0) {
                 System.out.println("댓글이 성공적으로 삭제되었습니다.");
             } else {
-                System.out.println("댓글 삭제에 실패했습니다.");
+                System.out.println("댓글 삭제에 실패했습니다. 해당 댓글이 존재하지 않거나 이미 삭제되었습니다.");
             }
         } catch (SQLException e) {
             System.err.println("댓글 삭제 중 오류 발생: " + e.getMessage());
         }
     }
-
 
     // 댓글 조회
     public static void viewComment(Scanner scanner, Connection connection) {
