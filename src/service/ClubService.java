@@ -186,4 +186,53 @@ public class ClubService {
             System.err.println("동아리 회원 목록 조회 중 오류 발생: " + e.getMessage());
         }
     }
+
+    // 동아리 탈퇴 (로그인한 회원이 가입한 동아리에서 자동으로 탈퇴)
+    public static void leaveClub(Scanner scanner, Connection connection, int memberId) {
+        // 로그인한 회원이 가입한 동아리 확인
+        String checkMembershipSql = "SELECT clubID FROM ClubMember WHERE memberID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(checkMembershipSql)) {
+            stmt.setInt(1, memberId);
+            ResultSet rs = stmt.executeQuery();
+
+            // 가입된 동아리가 없으면 탈퇴할 수 없음
+            if (!rs.next()) {
+                System.out.println("현재 가입된 동아리가 없습니다.");
+                return;
+            }
+
+            // 회원이 가입한 동아리 ID를 가져오기
+            int clubId = rs.getInt("clubID");
+
+            // 동아리 이름 조회
+            String clubNameSql = "SELECT clubName FROM Club WHERE clubID = ?";
+            try (PreparedStatement clubStmt = connection.prepareStatement(clubNameSql)) {
+                clubStmt.setInt(1, clubId);
+                ResultSet clubRs = clubStmt.executeQuery();
+                if (clubRs.next()) {
+                    String clubName = clubRs.getString("clubName");
+                    System.out.println(clubName + " 동아리에서 탈퇴합니다.");
+                }
+            }
+
+            // 동아리 탈퇴 처리
+            String deleteMembershipSql = "DELETE FROM ClubMember WHERE clubID = ? AND memberID = ?";
+            try (PreparedStatement stmtDelete = connection.prepareStatement(deleteMembershipSql)) {
+                stmtDelete.setInt(1, clubId);
+                stmtDelete.setInt(2, memberId);
+                int rowsAffected = stmtDelete.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    System.out.println("동아리에서 탈퇴되었습니다.");
+                } else {
+                    System.out.println("동아리 탈퇴에 실패했습니다.");
+                }
+            } catch (SQLException e) {
+                System.err.println("동아리 탈퇴 중 오류 발생: " + e.getMessage());
+            }
+
+        } catch (SQLException e) {
+            System.err.println("동아리 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
 }
